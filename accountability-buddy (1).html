@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>DRILLR — Your Accountability Buddy</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;700&display=swap');
+
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f0e8;
+    --red: #ff2d2d;
+    --yellow: #ffe135;
+    --gray: #1a1a1a;
+    --muted: #444;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* SCREENS */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ===== LANDING ===== */
+  #screen-landing {
+    background: var(--black);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .landing-noise {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .landing-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 60px 28px 40px;
+    flex: 1;
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: 4px;
+    color: var(--red);
+    margin-bottom: 80px;
+  }
+
+  .hero-headline {
+    font-family: var(--font-display);
+    font-size: clamp(72px, 20vw, 120px);
+    line-height: 0.9;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+
+  .hero-headline span {
+    color: var(--yellow);
+    display: block;
+  }
+
+  .hero-sub {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 60px;
+    line-height: 1.6;
+    max-width: 280px;
+  }
+
+  .hero-sub strong {
+    color: var(--white);
+  }
+
+  .price-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--gray);
+    border: 1px solid #333;
+    padding: 10px 16px;
+    margin-bottom: 24px;
+  }
+
+  .price-tag .amount {
+    font-family: var(--font-display);
+    font-size: 32px;
+    color: var(--yellow);
+  }
+
+  .price-tag .desc {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .cta-btn {
+    width: 100%;
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 20px 28px;
+    font-family: var(--font-display);
+    font-size: 24px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    text-align: center;
+  }
+
+  .cta-btn:active { transform: scale(0.98); background: #cc0000; }
+
+  .manifesto {
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 1px solid #222;
+  }
+
+  .manifesto p {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 12px;
+  }
+
+  .manifesto p strong { color: var(--white); }
+
+  /* ===== SETUP ===== */
+  #screen-setup {
+    padding: 50px 28px 40px;
+    background: var(--black);
+  }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+  }
+
+  .back-btn:hover { color: var(--white); }
+
+  .setup-title {
+    font-family: var(--font-display);
+    font-size: 48px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .setup-subtitle {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+  }
+
+  .form-group {
+    margin-bottom: 36px;
+  }
+
+  .form-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--gray);
+    border: 1px solid #333;
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 16px;
+    padding: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+  }
+
+  .form-input:focus { border-color: var(--red); }
+  .form-input::placeholder { color: var(--muted); }
+
+  /* Slider */
+  .slider-track {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .slider-option {
+    flex: 1;
+    padding: 12px 6px;
+    background: var(--gray);
+    border: 1px solid #333;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 1px;
+  }
+
+  .slider-option:hover { border-color: #555; color: var(--white); }
+
+  .slider-option.selected {
+    background: var(--red);
+    border-color: var(--red);
+    color: var(--white);
+  }
+
+  .slider-option.selected.yellow {
+    background: var(--yellow);
+    border-color: var(--yellow);
+    color: var(--black);
+  }
+
+  .tone-preview {
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: #111;
+    border-left: 3px solid var(--red);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #aaa;
+    line-height: 1.5;
+    min-height: 54px;
+    transition: all 0.2s;
+  }
+
+  .gemini-key-note {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+
+  .gemini-key-note a {
+    color: var(--yellow);
+    text-decoration: none;
+  }
+
+  /* ===== DASHBOARD ===== */
+  #screen-dashboard {
+    background: var(--black);
+    padding: 50px 28px 100px;
+  }
+
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
+  }
+
+  .dash-logo {
+    font-family: var(--font-display);
+    font-size: 16px;
+    letter-spacing: 4px;
+    color: var(--red);
+  }
+
+  .streak-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .streak-number {
+    font-family: var(--font-display);
+    font-size: 36px;
+    color: var(--yellow);
+    line-height: 1;
+  }
+
+  .streak-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .goal-card {
+    background: var(--gray);
+    border: 1px solid #333;
+    padding: 24px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .goal-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--red);
+  }
+
+  .goal-card-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .goal-card-text {
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+
+  .goal-tags {
+    display: flex;
+    gap: 8px;
+  }
+
+  .goal-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 4px 8px;
+    border: 1px solid #444;
+    color: var(--muted);
+  }
+
+  .goal-tag.red { border-color: var(--red); color: var(--red); }
+  .goal-tag.yellow { border-color: var(--yellow); color: var(--yellow); }
+
+  /* CHAT */
+  .chat-container {
+    background: var(--gray);
+    border: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    height: 420px;
+  }
+
+  .chat-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chat-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 16px;
+  }
+
+  .chat-name {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  .chat-status {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+  }
+
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background: #333; }
+
+  .message {
+    max-width: 85%;
+    animation: msgIn 0.2s ease;
+  }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.buddy { align-self: flex-start; }
+  .message.user { align-self: flex-end; }
+
+  .message-bubble {
+    padding: 12px 14px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .message.buddy .message-bubble {
+    background: #111;
+    border: 1px solid #333;
+    border-left: 3px solid var(--red);
+    color: var(--white);
+  }
+
+  .message.user .message-bubble {
+    background: var(--red);
+    color: var(--white);
+  }
+
+  .message-time {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+    padding: 0 4px;
+  }
+
+  .message.user .message-time { text-align: right; }
+
+  .chat-input-area {
+    border-top: 1px solid #333;
+    display: flex;
+    align-items: flex-end;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .chat-input {
+    flex: 1;
+    background: #111;
+    border: 1px solid #333;
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 10px 12px;
+    outline: none;
+    resize: none;
+    max-height: 80px;
+    line-height: 1.4;
+  }
+
+  .chat-input:focus { border-color: var(--red); }
+  .chat-input::placeholder { color: var(--muted); }
+
+  .send-btn {
+    background: var(--red);
+    border: none;
+    color: var(--white);
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .send-btn:hover { background: #cc0000; }
+  .send-btn:disabled { background: var(--muted); cursor: not-allowed; }
+
+  .typing-indicator {
+    display: none;
+    align-self: flex-start;
+    padding: 12px 14px;
+    background: #111;
+    border: 1px solid #333;
+    border-left: 3px solid var(--red);
+  }
+
+  .typing-indicator.visible { display: flex; gap: 4px; align-items: center; }
+
+  .typing-dot {
+    width: 6px; height: 6px;
+    background: var(--muted);
+    border-radius: 50%;
+    animation: typingBounce 1.2s infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-4px); }
+  }
+
+  /* NOTIF BUTTON */
+  .notif-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid #333;
+    color: var(--muted);
+    padding: 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.2s;
+  }
+
+  .notif-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+  .notif-btn.enabled { border-color: var(--yellow); color: var(--yellow); }
+
+  /* Check-in history */
+  .history-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin: 28px 0 12px;
+  }
+
+  .history-item {
+    border-bottom: 1px solid #1a1a1a;
+    padding: 12px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .history-date {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .history-text {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.4;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--yellow);
+    color: var(--black);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 12px 20px;
+    transition: transform 0.3s ease;
+    z-index: 100;
+    white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Loading */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .loading-overlay.active { display: flex; }
+
+  .loading-text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  .spinner {
+    width: 32px; height: 32px;
+    border: 2px solid #333;
+    border-top-color: var(--red);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* API Key setup */
+  .api-note {
+    background: #111;
+    border: 1px solid #333;
+    border-left: 3px solid var(--yellow);
+    padding: 16px;
+    margin-bottom: 28px;
+  }
+
+  .api-note p {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .api-note a { color: var(--yellow); text-decoration: none; }
+  .api-note strong { color: var(--white); }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text">DRILLR IS THINKING...</div>
+</div>
+
+<!-- ===== LANDING ===== -->
+<div class="screen active" id="screen-landing">
+  <div class="landing-noise"></div>
+  <div class="landing-content">
+    <div class="logo">DRILLR</div>
+    <div class="hero-headline">
+      NO
+      <span>EXCUSES.</span>
+    </div>
+    <p class="hero-sub">
+      Your AI accountability buddy that checks in at <strong>random times</strong>, calls out your BS, and tracks your <strong>one goal</strong> relentlessly.
+    </p>
+    <div class="price-tag">
+      <span class="amount">$1</span>
+      <span class="desc">per month<br>skin in the game</span>
+    </div>
+    <button class="cta-btn" onclick="goTo('screen-setup')">SET YOUR GOAL →</button>
+    <div class="manifesto">
+      <p><strong>Why pay?</strong> Because free commitments mean nothing. The $1 isn't the product. <strong>The guilt is.</strong></p>
+      <p>No dashboards. No streaks to game. Just an AI that knows your goal and won't let you forget it.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SETUP ===== -->
+<div class="screen" id="screen-setup">
+  <button class="back-btn" onclick="goTo('screen-landing')">← BACK</button>
+  <div class="setup-title">YOUR GOAL</div>
+  <p class="setup-subtitle">// one goal. that's it.</p>
+
+  <div class="api-note">
+    <p>
+      DRILLR uses <strong>Google Gemini</strong> for AI responses.<br>
+      Get your free API key at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a><br>
+      It's free. Paste it below.
+    </p>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Gemini API Key</label>
+    <input type="password" class="form-input" id="input-apikey" placeholder="AIza...">
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">What's your goal?</label>
+    <textarea class="form-input" id="input-goal" rows="3" placeholder="e.g. Launch my SaaS by March. Lose 10kg. Write 1000 words every day."></textarea>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Importance — how much does this matter?</label>
+    <div class="slider-track" id="importance-track">
+      <div class="slider-option" data-value="low" onclick="selectOption('importance', 'low', this)">LOW</div>
+      <div class="slider-option selected" data-value="medium" onclick="selectOption('importance', 'medium', this)">MEDIUM</div>
+      <div class="slider-option" data-value="high" onclick="selectOption('importance', 'high', this)">HIGH</div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Urgency — how fast does it need to happen?</label>
+    <div class="slider-track" id="urgency-track">
+      <div class="slider-option" data-value="low" onclick="selectOption('urgency', 'low', this)">LOW</div>
+      <div class="slider-option selected" data-value="medium" onclick="selectOption('urgency', 'medium', this)">MEDIUM</div>
+      <div class="slider-option" data-value="high" onclick="selectOption('urgency', 'high', this)">HIGH</div>
+    </div>
+    <div class="tone-preview" id="tone-preview">
+      Tone: <strong>No-nonsense coach.</strong> Check-ins: 2-3x per day at random times.
+    </div>
+  </div>
+
+  <button class="cta-btn" onclick="submitSetup()" style="margin-top: 8px;">LOCK IT IN →</button>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="screen" id="screen-dashboard">
+  <div class="dash-header">
+    <div class="dash-logo">DRILLR</div>
+    <div class="streak-badge">
+      <div class="streak-number" id="streak-count">0</div>
+      <div class="streak-label">DAY STREAK</div>
+    </div>
+  </div>
+
+  <div class="goal-card" id="goal-card">
+    <div class="goal-card-label">// YOUR GOAL</div>
+    <div class="goal-card-text" id="goal-display">—</div>
+    <div class="goal-tags">
+      <div class="goal-tag" id="tag-importance">IMPORTANCE: —</div>
+      <div class="goal-tag" id="tag-urgency">URGENCY: —</div>
+    </div>
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="chat-avatar">D</div>
+      <div>
+        <div class="chat-name">DRILLR BUDDY</div>
+        <div class="chat-status">ONLINE — WATCHING YOU</div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="typing-indicator" id="typing">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <textarea class="chat-input" id="chat-input" placeholder="Update your buddy..." rows="1" onkeydown="handleEnter(event)"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <button class="notif-btn" id="notif-btn" onclick="requestNotifications()">
+    🔔 ENABLE RANDOM CHECK-IN NOTIFICATIONS
+  </button>
+
+  <div class="history-title">// CHECK-IN HISTORY</div>
+  <div id="history-list"></div>
+
+  <button class="back-btn" style="margin-top: 40px; display:block;" onclick="resetApp()">↩ RESET GOAL</button>
+</div>
+
+<script>
+// ===== STATE =====
+let state = {
+  apiKey: '',
+  goal: '',
+  importance: 'medium',
+  urgency: 'medium',
+  streak: 0,
+  history: [],
+  messages: [],
+  lastCheckIn: null,
+  notificationsEnabled: false
+};
+
+// ===== TONE CONFIG =====
+const toneConfig = {
+  low:    { low: { tone: 'Gentle nudge',         freq: '1x per day',     times: 1 },
+            medium: { tone: 'Friendly coach',    freq: '1-2x per day',   times: 1 },
+            high: { tone: 'Firm but kind',       freq: '2x per day',     times: 2 } },
+  medium: { low: { tone: 'No-nonsense coach',    freq: '1-2x per day',   times: 2 },
+            medium: { tone: 'No-nonsense coach', freq: '2-3x per day',   times: 2 },
+            high: { tone: 'Tough love coach',    freq: '3x per day',     times: 3 } },
+  high:   { low: { tone: 'Drill sergeant',       freq: '2-3x per day',   times: 3 },
+            medium: { tone: 'Drill sergeant',    freq: '3-4x per day',   times: 3 },
+            high: { tone: 'FULL DRILL SERGEANT', freq: '4-5x per day',   times: 5 } }
+};
+
+function getTone() {
+  return toneConfig[state.importance][state.urgency];
+}
+
+// ===== NAVIGATION =====
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ===== SETUP =====
+function selectOption(type, value, el) {
+  const track = document.getElementById(type + '-track');
+  track.querySelectorAll('.slider-option').forEach(o => o.classList.remove('selected', 'yellow'));
+  el.classList.add('selected');
+  if (value === 'high') el.classList.add('yellow');
+  state[type] = value;
+  updateTonePreview();
+}
+
+function updateTonePreview() {
+  const cfg = getTone();
+  const previews = {
+    'Gentle nudge': '"Hey, just checking in — how\'s it going with your goal today?"',
+    'Friendly coach': '"Quick check-in! Any progress worth sharing?"',
+    'Firm but kind': '"Update time. What have you actually done today?"',
+    'No-nonsense coach': '"Status report. No fluff. What did you do?"',
+    'Tough love coach': '"You said this matters. Prove it. What happened today?"',
+    'Drill sergeant': '"REPORT. Progress. Now. No excuses."',
+    'FULL DRILL SERGEANT': '"WAKE UP. This is your 4th check-in. You committed to this. I\'m not letting you slide."'
+  };
+  document.getElementById('tone-preview').innerHTML =
+    `Tone: <strong>${cfg.tone}.</strong> Check-ins: ${cfg.freq}.<br><em style="color:#666;font-size:11px">${previews[cfg.tone]}</em>`;
+}
+
+function submitSetup() {
+  const apiKey = document.getElementById('input-apikey').value.trim();
+  const goal = document.getElementById('input-goal').value.trim();
+
+  if (!apiKey) { showToast('PASTE YOUR GEMINI API KEY'); return; }
+  if (!goal) { showToast('ENTER YOUR GOAL FIRST'); return; }
+
+  state.apiKey = apiKey;
+  state.goal = goal;
+  state.messages = [];
+  state.history = [];
+  state.streak = 0;
+
+  saveState();
+  initDashboard();
+  goTo('screen-dashboard');
+  sendOpeningMessage();
+}
+
+// ===== DASHBOARD =====
+function initDashboard() {
+  document.getElementById('goal-display').textContent = state.goal;
+  document.getElementById('streak-count').textContent = state.streak;
+
+  const imp = state.importance.toUpperCase();
+  const urg = state.urgency.toUpperCase();
+  const impTag = document.getElementById('tag-importance');
+  const urgTag = document.getElementById('tag-urgency');
+
+  impTag.textContent = `IMPORTANCE: ${imp}`;
+  urgTag.textContent = `URGENCY: ${urg}`;
+
+  if (state.importance === 'high') impTag.classList.add('yellow');
+  if (state.urgency === 'high') urgTag.classList.add('yellow');
+
+  renderHistory();
+  renderMessages();
+}
+
+// ===== GEMINI =====
+async function callGemini(userMessage) {
+  const cfg = getTone();
+  const historyContext = state.history.slice(-5).map(h => `[${h.date}] User said: "${h.text}"`).join('\n');
+  const excusePatterns = detectExcuses(state.history);
+
+  const systemPrompt = `You are DRILLR, a brutally honest accountability buddy. Your personality is: ${cfg.tone}.
+
+The user's goal: "${state.goal}"
+Importance: ${state.importance} | Urgency: ${state.urgency}
+
+Recent history:
+${historyContext || 'No history yet.'}
+
+${excusePatterns ? `PATTERNS YOU'VE NOTICED: ${excusePatterns}` : ''}
+
+Rules:
+- Be concise. Max 3 sentences.
+- Never accept excuses at face value. Call them out specifically.
+- Reference their goal directly.
+- If importance/urgency is HIGH, be harsh. If LOW, be encouraging but firm.
+- If you see a pattern of excuses, NAME IT.
+- No emojis. No fluff. No "I understand". Be real.
+- End with ONE specific actionable demand or question.`;
+
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${state.apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [
+        { role: 'user', parts: [{ text: systemPrompt + '\n\nUser says: ' + userMessage }] }
+      ],
+      generationConfig: { maxOutputTokens: 150, temperature: 0.8 }
+    })
+  });
+
+  const data = await response.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.candidates[0].content.parts[0].text;
+}
+
+function detectExcuses(history) {
+  if (history.length < 2) return null;
+  const excuseWords = ['tired', 'busy', 'no time', 'tomorrow', 'sick', 'forgot', 'couldn\'t', 'later'];
+  const excuses = history.filter(h => excuseWords.some(w => h.text.toLowerCase().includes(w)));
+  if (excuses.length >= 2) return `User has used excuses ${excuses.length} times. Common themes: ${excuses.slice(-2).map(e => e.text).join(' | ')}`;
+  return null;
+}
+
+// ===== CHAT =====
+async function sendOpeningMessage() {
+  const cfg = getTone();
+  const openings = {
+    'Gentle nudge': `Hey! I'm your accountability buddy. Your goal is "${state.goal}". I'll check in gently. Ready to start?`,
+    'Friendly coach': `Alright, I've got your goal: "${state.goal}". Let's do this. What's your first move?`,
+    'Firm but kind': `Goal locked: "${state.goal}". I'll be checking in. Don't make me ask twice.`,
+    'No-nonsense coach': `Noted. "${state.goal}". I'll be watching. What are you doing about it TODAY?`,
+    'Tough love coach': `"${state.goal}". You put $1 on this. That means you're serious. Prove it. What's happening right now?`,
+    'Drill sergeant': `GOAL CONFIRMED: "${state.goal}". I don't care how you feel. I care what you DO. Report your first action. Now.`,
+    'FULL DRILL SERGEANT': `"${state.goal}". You paid for accountability. You're getting it. I will check on you MULTIPLE TIMES today. There is NO hiding. What are you doing RIGHT NOW?`
+  };
+
+  const msg = openings[cfg.tone] || openings['No-nonsense coach'];
+  addBuddyMessage(msg);
+}
+
+function addBuddyMessage(text) {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  state.messages.push({ role: 'buddy', text, time: timeStr });
+  renderMessages();
+}
+
+function addUserMessage(text) {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const dateStr = now.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  state.messages.push({ role: 'user', text, time: timeStr });
+  state.history.push({ text, date: dateStr });
+  updateStreak();
+  renderMessages();
+  renderHistory();
+  saveState();
+}
+
+function renderMessages() {
+  const container = document.getElementById('chat-messages');
+  const typing = document.getElementById('typing');
+  container.innerHTML = '';
+  container.appendChild(typing);
+
+  state.messages.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = `message ${msg.role}`;
+    div.innerHTML = `
+      <div class="message-bubble">${msg.text}</div>
+      <div class="message-time">${msg.time}</div>
+    `;
+    container.insertBefore(div, typing);
+  });
+
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  addUserMessage(text);
+
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('typing').classList.add('visible');
+  document.getElementById('chat-messages').scrollTop = 999999;
+
+  try {
+    const reply = await callGemini(text);
+    document.getElementById('typing').classList.remove('visible');
+    addBuddyMessage(reply);
+  } catch (e) {
+    document.getElementById('typing').classList.remove('visible');
+    addBuddyMessage('API error: ' + e.message + ' — Check your Gemini API key.');
+  }
+
+  document.getElementById('send-btn').disabled = false;
+}
+
+function handleEnter(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+// ===== STREAK =====
+function updateStreak() {
+  const today = new Date().toDateString();
+  if (state.lastCheckIn !== today) {
+    state.lastCheckIn = today;
+    state.streak += 1;
+    document.getElementById('streak-count').textContent = state.streak;
+  }
+}
+
+// ===== HISTORY =====
+function renderHistory() {
+  const container = document.getElementById('history-list');
+  if (state.history.length === 0) {
+    container.innerHTML = '<p style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">No check-ins yet.</p>';
+    return;
+  }
+  container.innerHTML = state.history.slice().reverse().slice(0, 10).map(h => `
+    <div class="history-item">
+      <div class="history-date">${h.date}</div>
+      <div class="history-text">${h.text}</div>
+    </div>
+  `).join('');
+}
+
+// ===== NOTIFICATIONS =====
+function requestNotifications() {
+  if (!('Notification' in window)) {
+    showToast('NOTIFICATIONS NOT SUPPORTED IN THIS BROWSER');
+    return;
+  }
+
+  Notification.requestPermission().then(permission => {
+    if (permission === 'granted') {
+      state.notificationsEnabled = true;
+      document.getElementById('notif-btn').textContent = '🔔 RANDOM CHECK-INS ENABLED';
+      document.getElementById('notif-btn').classList.add('enabled');
+      saveState();
+      scheduleNotifications();
+      showToast('CHECK-INS ENABLED. NO HIDING NOW.');
+    } else {
+      showToast('NOTIFICATIONS BLOCKED — ENABLE IN BROWSER SETTINGS');
+    }
+  });
+}
+
+function scheduleNotifications() {
+  const cfg = getTone();
+  const count = cfg.times;
+
+  // Schedule notifications throughout the day
+  const checkIns = [
+    'STATUS REPORT. What have you done for your goal today?',
+    'Random check-in. Progress update. Now.',
+    `"${state.goal}" — still on track? Prove it.`,
+    'DRILLR CHECK-IN. No excuses. What happened?',
+    'It\'s check-in time. You know what to do.'
+  ];
+
+  // For demo, fire one after 30 seconds and then random intervals
+  setTimeout(() => {
+    if (state.notificationsEnabled) {
+      new Notification('DRILLR CHECK-IN', {
+        body: checkIns[Math.floor(Math.random() * checkIns.length)],
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23ff2d2d"/><text y=".9em" font-size="90" x="5">D</text></svg>'
+      });
+    }
+  }, 30000);
+
+  // Schedule remaining check-ins at random intervals throughout the day
+  for (let i = 1; i < count; i++) {
+    const delay = Math.random() * 8 * 3600 * 1000 + i * 2 * 3600 * 1000;
+    setTimeout(() => {
+      if (state.notificationsEnabled) {
+        new Notification('DRILLR CHECK-IN', {
+          body: checkIns[Math.floor(Math.random() * checkIns.length)],
+        });
+      }
+    }, delay);
+  }
+}
+
+// ===== PERSISTENCE =====
+function saveState() {
+  try {
+    localStorage.setItem('drillr_state', JSON.stringify(state));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('drillr_state');
+    if (saved) {
+      state = { ...state, ...JSON.parse(saved) };
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+function resetApp() {
+  if (confirm('Reset your goal? Your history will be cleared.')) {
+    localStorage.removeItem('drillr_state');
+    state = { apiKey: '', goal: '', importance: 'medium', urgency: 'medium', streak: 0, history: [], messages: [], lastCheckIn: null, notificationsEnabled: false };
+    goTo('screen-landing');
+  }
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ===== INIT =====
+window.addEventListener('load', () => {
+  const hasState = loadState();
+  if (hasState && state.goal && state.apiKey) {
+    initDashboard();
+    goTo('screen-dashboard');
+    if (state.notificationsEnabled) scheduleNotifications();
+  }
+  updateTonePreview();
+});
+</script>
+</body>
+</html>
